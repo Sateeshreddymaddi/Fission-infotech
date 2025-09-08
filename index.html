@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leo9 - Design Transform Accelerate</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fafafa;
+      color: #000;
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    /* Dark Mode */
+    body.dark-mode {
+      background: #121212;
+      color: #eee;
+    }
+    body.dark-mode .header {
+      background: rgba(15, 15, 15, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    body.dark-mode .nav-link { color: #ccc; }
+    body.dark-mode .nav-link:hover { color: #fff; }
+    body.dark-mode .contact-btn { background: #fff; color: #000; }
+    body.dark-mode .contact-btn:hover { background: #ccc; }
+    body.dark-mode .service-card { background: #1e1e1e; color: #ddd; }
+    body.dark-mode .about { background: #181818; }
+    body.dark-mode .footer { background: #111; color: #ccc; }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      transition: background 0.3s ease;
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #000;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      margin-right: 8px;
+      background: #000;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .logo-icon::before {
+      content: '';
+      width: 16px; height: 16px;
+      background: white;
+      border-radius: 2px;
+      transform: rotate(45deg);
+    }
+
+    /* Mobile Menu Styles */
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 0.5rem;
+      background: none;
+      border: none;
+      z-index: 1001;
+    }
+    
+    .hamburger-line {
+      width: 25px;
+      height: 3px;
+      background: #000;
+      margin: 3px 0;
+      transition: 0.3s;
+      border-radius: 2px;
+    }
+    
+    body.dark-mode .hamburger-line {
+      background: #fff;
+    }
+    
+    .mobile-menu-toggle.active .hamburger-line:nth-child(1) {
+      transform: rotate(-45deg) translate(-6px, 6px);
+    }
+    
+    .mobile-menu-toggle.active .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .mobile-menu-toggle.active .hamburger-line:nth-child(3) {
+      transform: rotate(45deg) translate(-6px, -6px);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      position: relative;
+    }
+    
+    .nav-link {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    .nav-link:hover { color: #000; }
+
+    /* Enhanced Dropdown Styles - Fixed Positioning */
+    .dropdown { position: relative; }
+    .dropdown > a::after {
+      content: " ";
+      font-size: 0.7rem;
+      margin-left: 0.3rem;
+    }
+    
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 120%; 
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      padding: 1.5rem;
+      z-index: 1000;
+      border: 1px solid rgba(0,0,0,0.05);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      display: grid;
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .services-dropdown {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      min-width: 700px;
+      left: -250px; /* Positioned to appear properly under Services */
+    }
+
+    .about-dropdown {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      min-width: 700px;
+      left: -300px; /* Positioned to appear properly under About */
+    }
+
+    .dropdown-card {
+      padding: 2rem 1.5rem;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.05);
+      text-align: left;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Services dropdown cards */
+    .services-dropdown .dropdown-card:nth-child(1) {
+      background: #f8d7da; /* Light pink - Design */
+    }
+
+    .services-dropdown .dropdown-card:nth-child(2) {
+      background: #d1ecf1; /* Light blue - Technology */
+    }
+
+    .services-dropdown .dropdown-card:nth-child(3) {
+      background: #e2e3e5; /* Light gray - Marketing */
+    }
+
+    /* About dropdown cards */
+    .about-dropdown .dropdown-card:nth-child(1) {
+      background: #f8d7da; /* Light pink - About Us */
+    }
+
+    .about-dropdown .dropdown-card:nth-child(2) {
+      background: #d1ecf1; /* Light blue - Team */
+    }
+
+    .about-dropdown .dropdown-card:nth-child(3) {
+      background: #e2e3e5; /* Light gray - Career */
+    }
+
+    .dropdown-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .dropdown-card h4 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #000;
+    }
+
+    .dropdown-card p {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.5;
+      margin: 0;
+      flex-grow: 1;
+    }
+
+    .dropdown-card .arrow {
+      position: absolute;
+      right: 1.5rem;
+      bottom: 1.5rem;
+      font-size: 1.5rem;
+      color: #333;
+      transition: transform 0.3s ease;
+    }
+
+    .dropdown-card:hover .arrow {
+      transform: translateX(5px);
+    }
+
+    /* Dark mode dropdown styles */
+    body.dark-mode .dropdown-menu { 
+      background: #222; 
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    body.dark-mode .dropdown-card {
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    body.dark-mode .services-dropdown .dropdown-card:nth-child(1),
+    body.dark-mode .about-dropdown .dropdown-card:nth-child(1) {
+      background: #2d1b1e; /* Dark pink */
+    }
+
+    body.dark-mode .services-dropdown .dropdown-card:nth-child(2),
+    body.dark-mode .about-dropdown .dropdown-card:nth-child(2) {
+      background: #1a2a2e; /* Dark blue */
+    }
+
+    body.dark-mode .services-dropdown .dropdown-card:nth-child(3),
+    body.dark-mode .about-dropdown .dropdown-card:nth-child(3) {
+      background: #2a2a2a; /* Dark gray */
+    }
+
+    body.dark-mode .dropdown-card h4 { color: #fff; }
+    body.dark-mode .dropdown-card p { color: #ccc; }
+    body.dark-mode .dropdown-card .arrow { color: #fff; }
+
+    .theme-toggle {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1px solid #ddd;
+      background: white;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .theme-toggle:hover { background: #f5f5f5; }
+    .contact-btn {
+      background: #000; color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .contact-btn:hover {
+      background: #333;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding: 0 2rem;
+      margin-top: 80px;
+    }
+    .hero-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      width: 100%;
+    }
+    .hero-content h1 {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 900;
+      line-height: 0.9;
+      margin-bottom: 2rem;
+    }
+    .hero-content p {
+      font-size: 1.25rem;
+      color: #666;
+      line-height: 1.6;
+      max-width: 500px;
+    }
+
+    /* Animated Dots */
+    .dots-container {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dot {
+      position: absolute;
+      border-radius: 50%;
+      animation: float 4s ease-in-out infinite;
+    }
+    .dot-red { background: #ff4757; }
+    .dot-blue { background: #3742fa; }
+    .dot-purple { background: #a55eea; }
+    .dot-black { background: #2f3542; }
+    .dot-small { width: 8px; height: 8px; }
+    .dot-medium { width: 12px; height: 12px; }
+    .dot-large { width: 16px; height: 16px; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      25% { transform: translateY(-20px) translateX(10px); }
+      50% { transform: translateY(0px) translateX(20px); }
+      75% { transform: translateY(20px) translateX(10px); }
+    }
+
+    /* Services Section */
+    .services { padding: 6rem 2rem; background: white; }
+    .services-container { max-width: 1400px; margin: 0 auto; }
+    .services h2 {
+      font-size: 3rem; font-weight: 800;
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 3rem;
+    }
+    .service-card {
+      background: #fafafa;
+      padding: 3rem 2rem;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .service-icon {
+      width: 60px; height: 60px;
+      background: #000;
+      border-radius: 50%;
+      margin: 0 auto 2rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .service-card h3 {
+      font-size: 1.5rem; font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .service-card p { color: #666; line-height: 1.6; }
+
+    /* About Section */
+    .about {
+      padding: 6rem 2rem;
+      background: #f8f9fa;
+    }
+    .about-container { max-width: 1200px; margin: 0 auto; text-align: center; }
+    .about h2 { font-size: 3rem; font-weight: 800; margin-bottom: 2rem; }
+    .about p {
+      font-size: 1.25rem; color: #666;
+      line-height: 1.8; max-width: 800px;
+      margin: 0 auto 3rem;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+    .stat { text-align: center; }
+    .stat-number {
+      font-size: 3rem; font-weight: 900; display: block;
+    }
+    .stat-label { color: #666; font-weight: 500; margin-top: 0.5rem; }
+
+    /* Footer */
+    .footer { background: #000; color: white; padding: 4rem 2rem 2rem; }
+    .footer-container { max-width: 1400px; margin: 0 auto; }
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 3rem; margin-bottom: 3rem;
+    }
+    .footer-section h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .footer-section p, .footer-section a {
+      color: #ccc; text-decoration: none;
+      line-height: 1.6; margin-bottom: 0.5rem; display: block;
+    }
+    .footer-section a:hover { color: white; }
+    .footer-bottom {
+      border-top: 1px solid #333;
+      padding-top: 2rem;
+      text-align: center; color: #666;
+    }
+
+    /* Mobile Navigation Overlay */
+    .mobile-nav-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      padding: 100px 2rem 2rem;
+      overflow-y: auto;
+    }
+
+    body.dark-mode .mobile-nav-overlay {
+      background: rgba(18, 18, 18, 0.98);
+    }
+
+    .mobile-nav-overlay.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .mobile-nav-content {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .mobile-nav-link {
+      display: block;
+      padding: 1.5rem 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #000;
+      text-decoration: none;
+      border-bottom: 1px solid #eee;
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .mobile-nav-link {
+      color: #fff;
+      border-bottom-color: #333;
+    }
+
+    .mobile-nav-link:hover {
+      color: #666;
+    }
+
+    body.dark-mode .mobile-nav-link:hover {
+      color: #ccc;
+    }
+
+    .mobile-dropdown {
+      margin-top: 1rem;
+    }
+
+    .mobile-dropdown-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #000;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .mobile-dropdown-title {
+      color: #fff;
+      border-bottom-color: #333;
+    }
+
+    .mobile-dropdown-arrow {
+      transition: transform 0.3s ease;
+    }
+
+    .mobile-dropdown.active .mobile-dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    .mobile-dropdown-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .mobile-dropdown.active .mobile-dropdown-content {
+      max-height: 500px;
+    }
+
+    .mobile-dropdown-card {
+      padding: 1.5rem;
+      margin: 1rem 0;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .mobile-dropdown-card {
+      border-color: #333;
+    }
+
+    .mobile-dropdown-card:nth-child(1) { background: #f8d7da; }
+    .mobile-dropdown-card:nth-child(2) { background: #d1ecf1; }
+    .mobile-dropdown-card:nth-child(3) { background: #e2e3e5; }
+
+    body.dark-mode .mobile-dropdown-card:nth-child(1) { background: #2d1b1e; }
+    body.dark-mode .mobile-dropdown-card:nth-child(2) { background: #1a2a2e; }
+    body.dark-mode .mobile-dropdown-card:nth-child(3) { background: #2a2a2a; }
+
+    .mobile-dropdown-card h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #000;
+    }
+
+    body.dark-mode .mobile-dropdown-card h4 {
+      color: #fff;
+    }
+
+    .mobile-dropdown-card p {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    body.dark-mode .mobile-dropdown-card p {
+      color: #ccc;
+    }
+
+    .mobile-theme-toggle {
+      margin: 2rem 0;
+      text-align: center;
+    }
+
+    .mobile-contact-btn {
+      display: block;
+      background: #000;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      text-align: center;
+      margin: 2rem 0;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .mobile-contact-btn {
+      background: #fff;
+      color: #000;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+
+      .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 2rem;
+      }
+      
+      .hero-content h1 { 
+        font-size: 3rem; 
+      }
+      
+      .dots-container { 
+        height: 300px; 
+      }
+
+      /* Prevent body scroll when mobile menu is open */
+      body.mobile-menu-open {
+        overflow: hidden;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .dropdown-menu {
+        min-width: 280px;
+        max-width: 90vw;
+      }
+      
+      .services-dropdown,
+      .about-dropdown {
+        grid-template-columns: repeat(3, 1fr);
+        min-width: 700px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <nav class="nav">
+      <a href="#" class="logo">
+        <div class="logo-icon"></div>
+        leo9
+      </a>
+
+      <!-- Desktop Navigation -->
+      <div class="nav-links">
+        <a href="#work" class="nav-link">Work</a>
+        
+        <!-- Enhanced Services Dropdown -->
+        <div class="nav-link dropdown">
+          <a href="#services">Services</a>
+          <div class="dropdown-menu services-dropdown">
+            <div class="dropdown-card" onclick="navigateToSection('#design')">
+              <h4>Design.</h4>
+              <p>Handcraft the user experience.</p>
+              <span class="arrow">→</span>
+            </div>
+            <div class="dropdown-card" onclick="navigateToSection('#technology')">
+              <h4>Technology.</h4>
+              <p>Leverage the power of code.</p>
+              <span class="arrow">→</span>
+            </div>
+            <div class="dropdown-card" onclick="navigateToSection('#marketing')">
+              <h4>Marketing.</h4>
+              <p>Creative strategies for brands.</p>
+              <span class="arrow">→</span>
+            </div>
+          </div>
+        </div>
+        
+        <a href="#clients" class="nav-link">Clients</a>
+        
+        <!-- New About Dropdown -->
+        <div class="nav-link dropdown">
+          <a href="#about">About</a>
+          <div class="dropdown-menu about-dropdown">
+            <div class="dropdown-card" onclick="navigateToSection('#about-us')">
+              <h4>About Us.</h4>
+              <p>We are super-efficient yet humble to serve you!</p>
+              <span class="arrow">→</span>
+            </div>
+            <div class="dropdown-card" onclick="navigateToSection('#team')">
+              <h4>Team.</h4>
+              <p>We are proud of our experienced and accomplished team!</p>
+              <span class="arrow">→</span>
+            </div>
+            <div class="dropdown-card" onclick="navigateToSection('#career')">
+              <h4>Career.</h4>
+              <p>Can you offer such experience?</p>
+              <span class="arrow">→</span>
+            </div>
+          </div>
+        </div>
+        
+        <a href="#knowledge" class="nav-link">Knowledge</a>
+        <button class="theme-toggle">☀️</button>
+        <a href="#contact" class="contact-btn">Contact</a>
+      </div>
+
+      <!-- Mobile Hamburger Menu -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay">
+    <div class="mobile-nav-content">
+      <a href="#work" class="mobile-nav-link" onclick="closeMobileMenu()">Work</a>
+      
+      <!-- Mobile Services Dropdown -->
+      <div class="mobile-dropdown" id="mobileServicesDropdown">
+        <div class="mobile-dropdown-title" onclick="toggleMobileDropdown('mobileServicesDropdown')">
+          <span>Services</span>
+          <span class="mobile-dropdown-arrow">▼</span>
+        </div>
+        <div class="mobile-dropdown-content">
+          <div class="mobile-dropdown-card" onclick="navigateToSection('#design'); closeMobileMenu();">
+            <h4>Design.</h4>
+            <p>Handcraft the user experience.</p>
+          </div>
+          <div class="mobile-dropdown-card" onclick="navigateToSection('#technology'); closeMobileMenu();">
+            <h4>Technology.</h4>
+            <p>Leverage the power of code.</p>
+          </div>
+          <div class="mobile-dropdown-card" onclick="navigateToSection('#marketing'); closeMobileMenu();">
+            <h4>Marketing.</h4>
+            <p>Creative strategies for brands.</p>
+          </div>
+        </div>
+      </div>
+      
+      <a href="#clients" class="mobile-nav-link" onclick="closeMobileMenu()">Clients</a>
+      
+      <!-- Mobile About Dropdown -->
+      <div class="mobile-dropdown" id="mobileAboutDropdown">
+        <div class="mobile-dropdown-title" onclick="toggleMobileDropdown('mobileAboutDropdown')">
+          <span>About</span>
+          <span class="mobile-dropdown-arrow">▼</span>
+        </div>
+        <div class="mobile-dropdown-content">
+          <div class="mobile-dropdown-card" onclick="navigateToSection('#about-us'); closeMobileMenu();">
+            <h4>About Us.</h4>
+            <p>We are super-efficient yet humble to serve you!</p>
+          </div>
+          <div class="mobile-dropdown-card" onclick="navigateToSection('#team'); closeMobileMenu();">
+            <h4>Team.</h4>
+            <p>We are proud of our experienced and accomplished team!</p>
+          </div>
+          <div class="mobile-dropdown-card" onclick="navigateToSection('#career'); closeMobileMenu();">
+            <h4>Career.</h4>
+            <p>Can you offer such experience?</p>
+          </div>
+        </div>
+      </div>
+      
+      <a href="#knowledge" class="mobile-nav-link" onclick="closeMobileMenu()">Knowledge</a>
+      
+      <div class="mobile-theme-toggle">
+        <button class="theme-toggle" id="mobileThemeToggle">☀️</button>
+      </div>
+      
+      <a href="#contact" class="mobile-contact-btn" onclick="closeMobileMenu()">Contact</a>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <h1>Design<br>Transform<br>Accelerate</h1>
+        <p>Redefining user experiences through Behavioural Science & AI</p>
+      </div>
+      <div class="dots-container"></div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section class="services" id="services">
+    <div class="services-container">
+      <h2>Our Services</h2>
+      <div class="services-grid">
+        <div class="service-card" id="design">
+          <div class="service-icon">🎨</div>
+          <h3>Design Strategy</h3>
+          <p>Creating compelling user experiences through research-driven design strategies that align with business goals and user needs.</p>
+        </div>
+        <div class="service-card" id="technology">
+          <div class="service-icon">🧠</div>
+          <h3>Technology Solutions</h3>
+          <p>Leveraging cutting-edge technology and AI to build scalable, efficient solutions that drive business growth.</p>
+        </div>
+        <div class="service-card" id="marketing">
+          <div class="service-icon">🤖</div>
+          <h3>Marketing Strategy</h3>
+          <p>Developing creative marketing strategies that connect brands with their target audience through innovative approaches.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about" id="about">
+    <div class="about-container">
+      <h2>About Leo9</h2>
+      <p>We are a forward-thinking design agency that combines the power of behavioral science with cutting-edge AI technology to create transformative user experiences. Our approach goes beyond traditional design to understand the psychology behind user interactions and leverage artificial intelligence to accelerate business growth.</p>
+      
+      <!-- About Us Subsection -->
+      <div id="about-us" style="margin-top: 4rem;">
+        <h3>About Us</h3>
+        <p>We are super-efficient yet humble to serve you! Our team focuses on delivering exceptional results while maintaining a collaborative and respectful approach with every client.</p>
+      </div>
+      
+      <!-- Team Subsection -->
+      <div id="team" style="margin-top: 3rem;">
+        <h3>Our Team</h3>
+        <p>We are proud of our experienced and accomplished team! Our diverse group of designers, developers, and strategists brings years of expertise to every project.</p>
+      </div>
+      
+      <!-- Career Subsection -->
+      <div id="career" style="margin-top: 3rem;">
+        <h3>Careers</h3>
+        <p>Can you offer such experience? We're always looking for talented individuals who share our passion for innovation and excellence. Join our team and help shape the future of digital experiences.</p>
+      </div>
+      
+      <div class="stats">
+        <div class="stat"><span class="stat-number">150+</span><span class="stat-label">Projects Completed</span></div>
+        <div class="stat"><span class="stat-number">50+</span><span class="stat-label">Happy Clients</span></div>
+        <div class="stat"><span class="stat-number">5+</span><span class="stat-label">Years Experience</span></div>
+        <div class="stat"><span class="stat-number">25%</span><span class="stat-label">Average Growth</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <div class="footer-container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Leo9</h3>
+          <p>Redefining user experiences through Behavioural Science & AI</p>
+          <p>Ready to transform your digital presence? Let's create something extraordinary together.</p>
+        </div>
+        <div class="footer-section">
+          <h3>Services</h3>
+          <a href="#design">UX/UI Design</a>
+          <a href="#technology">Technology Solutions</a>
+          <a href="#marketing">Marketing Strategy</a>
+          <a href="#">Strategy Consulting</a>
+          <a href="#">Research & Testing</a>
+        </div>
+        <div class="footer-section">
+          <h3>Company</h3>
+          <a href="#about-us">About Us</a>
+          <a href="#team">Our Team</a>
+          <a href="#career">Careers</a>
+          <a href="#">Blog</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div class="footer-section">
+          <h3>Contact</h3>
+          <a href="mailto:hello@leo9.design">hello@leo9.design</a>
+          <a href="tel:+1234567890">+1 (234) 567-890</a>
+          <p>123 Design Street<br>Creative District<br>Innovation City, IC 12345</p>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2025 Leo9. All rights reserved.</p></div>
+    </div>
+  </footer>
+
+  <script>
+    // Generate animated dots
+    function createDots() {
+      const container = document.querySelector('.dots-container');
+      const colors = ['red','blue','purple','black'];
+      const sizes = ['small','medium','large'];
+      for (let i = 0; i < 30; i++) {
+        const dot = document.createElement('div');
+        const color = colors[Math.floor(Math.random()*colors.length)];
+        const size = sizes[Math.floor(Math.random()*sizes.length)];
+        dot.className = `dot dot-${color} dot-${size}`;
+        dot.style.left = Math.random()*80+10+'%';
+        dot.style.top = Math.random()*80+10+'%';
+        dot.style.animationDelay = Math.random()*4+'s';
+        dot.style.animationDuration = (3+Math.random()*2)+'s';
+        container.appendChild(dot);
+      }
+    }
+    
+    // Theme toggle functionality
+    function initThemeToggle() {
+      const desktopThemeToggle = document.querySelector('.theme-toggle');
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+      
+      function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const themeIcon = isDarkMode ? '🌙' : '☀️';
+        desktopThemeToggle.textContent = themeIcon;
+        mobileThemeToggle.textContent = themeIcon;
+      }
+      
+      desktopThemeToggle.addEventListener('click', toggleTheme);
+      mobileThemeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    // Mobile menu functionality
+    function initMobileMenu() {
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+      
+      mobileMenuToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        mobileNavOverlay.classList.toggle('active');
+        document.body.classList.toggle('mobile-menu-open');
+      });
+    }
+    
+    // Close mobile menu
+    function closeMobileMenu() {
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+      
+      mobileMenuToggle.classList.remove('active');
+      mobileNavOverlay.classList.remove('active');
+      document.body.classList.remove('mobile-menu-open');
+    }
+    
+    // Toggle mobile dropdown
+    function toggleMobileDropdown(dropdownId) {
+      const dropdown = document.getElementById(dropdownId);
+      dropdown.classList.toggle('active');
+    }
+    
+    // Navigation function for dropdown cards
+    function navigateToSection(sectionId) {
+      const target = document.querySelector(sectionId);
+      if (target) {
+        target.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }
+    
+    // Smooth scrolling for regular links
+    function initSmoothScrolling() {
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({behavior:'smooth', block:'start'});
+          }
+        });
+      });
+    }
+    
+    // Enhanced dropdown functionality for desktop
+    function initDropdowns() {
+      const dropdowns = document.querySelectorAll('.dropdown');
+      
+      dropdowns.forEach(dropdown => {
+        const menu = dropdown.querySelector('.dropdown-menu');
+        let hoverTimeout;
+        
+        dropdown.addEventListener('mouseenter', () => {
+          clearTimeout(hoverTimeout);
+          menu.style.display = 'grid';
+          setTimeout(() => {
+            menu.style.opacity = '1';
+            menu.style.visibility = 'visible';
+          }, 10);
+        });
+        
+        dropdown.addEventListener('mouseleave', () => {
+          menu.style.opacity = '0';
+          menu.style.visibility = 'hidden';
+          hoverTimeout = setTimeout(() => {
+            menu.style.display = 'none';
+          }, 300);
+        });
+      });
+    }
+    
+    // Close mobile menu when clicking outside
+    function initClickOutside() {
+      const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+      
+      mobileNavOverlay.addEventListener('click', function(e) {
+        if (e.target === mobileNavOverlay) {
+          closeMobileMenu();
+        }
+      });
+    }
+    
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      createDots();
+      initThemeToggle();
+      initSmoothScrolling();
+      initDropdowns();
+      initMobileMenu();
+      initClickOutside();
+    });
+  </script>
+</body>
+</html>
